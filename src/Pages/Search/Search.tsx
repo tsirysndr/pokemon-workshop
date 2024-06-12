@@ -1,10 +1,13 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { CardInner, Container } from "./styles";
 import Card from "../../Components/Card";
 import Button from "../../Components/Button";
 import { Container as DefaultButton } from "../../Components/Button/styles";
 import styled from "@emotion/styled";
 import { Shuffle } from "@styled-icons/bootstrap";
+import { useNavigate } from "react-router-dom";
+import _ from "lodash";
+import { POKEMON_API } from "../../consts";
 
 const ShuffleButton = styled(DefaultButton)`
   color: #ff8000;
@@ -67,6 +70,21 @@ const Label = styled.label`
 `;
 
 const SearchPage: FC = () => {
+  const [search, setSearch] = useState("");
+  const navigate = useNavigate();
+
+  const onSearch = async () => {
+    if (!search) return;
+    const data = await fetch(`${POKEMON_API}/pokemon/${search}`).then((res) =>
+      res.text()
+    );
+    if (data === "Not Found") {
+      alert("Pokemon not found");
+      return;
+    }
+    navigate(`/pokemon/${JSON.parse(data).id}`);
+  };
+
   return (
     <Container>
       <Card>
@@ -86,12 +104,23 @@ const SearchPage: FC = () => {
               />
             </div>
             <Label>POKEMON NAME OR ID</Label>
-            <Input type="text" placeholder="Search" />
+            <Input
+              type="text"
+              placeholder="Search"
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  onSearch();
+                }
+              }}
+            />
           </CardBody>
           <Footer>
             <Row>
-              <Button>Search</Button>
-              <ShuffleButton>
+              <Button onClick={onSearch}>Search</Button>
+              <ShuffleButton
+                onClick={() => navigate(`/pokemon/${_.random(1025)}`)}
+              >
                 <Icon>
                   <Shuffle size={25} color="#ff8000" />
                 </Icon>

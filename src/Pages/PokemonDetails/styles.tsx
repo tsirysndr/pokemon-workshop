@@ -15,4 +15,7 @@ export const Container = styled.div`
   );
 `;
 
-export const CardInner = styled.div``;
+export const CardInner = styled.div`
+  width: 65vw;
+  height: 80vh;
+`;
